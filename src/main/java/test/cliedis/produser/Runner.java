@@ -15,8 +15,10 @@ public class Runner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Sending message...");
-        rabbitTemplate.convertAndSend(CliedisProduserApplication.topicExchangeName, "", "Hello from RabbitMQ!");
-    }
+        //System.out.println("Sending message...");
 
+//        rabbitTemplate.convertAndSend(
+//                CliedisProduserApplication.exchangeName, CliedisProduserApplication.routingKey, "Hello from CRM!"
+//        );
+    }
 }
