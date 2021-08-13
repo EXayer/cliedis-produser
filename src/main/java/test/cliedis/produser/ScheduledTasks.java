@@ -1,5 +1,6 @@
 package test.cliedis.produser;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -14,7 +15,28 @@ public class ScheduledTasks {
 
     static class TransferObject {
         public int id; // TODO: tmp
+
+        // Main platform deal id
+        @JsonProperty("deal_id")
         public int dealId;
+
+        // Main platform nbt deal id
+        @JsonProperty("nbt_deal_id")
+        public int nbtDealId;
+
+        // CRM cliedis status (117).
+        // Will be matched on main platform to ('no-updates', 'action-needed', 'not-matched')
+        @JsonProperty("status")
+        public String status;
+
+        @JsonProperty("policy_id")
+        public Long policyId;
+
+        // Main platform deal type.
+        // 'dsc', 'group', 'health_dental_travel', 'insurance', 'investments', 'mutual',
+        // 'segregated', 'unlicensed'
+        @JsonProperty("deal_type")
+        public String dealType;
 
         public TransferObject(int id) {
             this.id = id;
