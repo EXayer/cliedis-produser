@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import test.cliedis.produser.domain.CliedisStatus;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -14,33 +15,49 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ScheduledTasks {
 
     static class TransferObject {
-        public int id; // TODO: tmp
 
-        // Main platform deal id
-        @JsonProperty("deal_id")
-        public int dealId;
+        static class TransferBody {
+            // Main platform deal id
+            @JsonProperty("deal_id")
+            public int dealId;
 
-        // Main platform nbt deal id
-        @JsonProperty("nbt_deal_id")
-        public int nbtDealId;
+            // Main platform nbt deal id
+            @JsonProperty("nbt_deal_id")
+            public int nbtDealId;
 
-        // CRM cliedis status (117).
-        // Will be matched on main platform to ('no-updates', 'action-needed', 'not-matched')
-        @JsonProperty("status")
-        public String status;
+            // CRM cliedis status (117).
+            // Will be matched on main platform to ('no-updates', 'action-needed', 'not-matched')
+            @JsonProperty("status")
+            public String status;
 
-        @JsonProperty("policy_id")
-        public Long policyId;
+            @JsonProperty("policy_id")
+            public Long policyId;
 
-        // Main platform deal type.
-        // 'dsc', 'group', 'health_dental_travel', 'insurance', 'investments', 'mutual',
-        // 'segregated', 'unlicensed'
-        @JsonProperty("deal_type")
-        public String dealType;
+            // Main platform deal type.
+            // 'dsc', 'group', 'health_dental_travel', 'insurance', 'investments', 'mutual',
+            // 'segregated', 'unlicensed'
+            @JsonProperty("deal_type")
+            public String dealType;
 
-        public TransferObject(int id) {
-            this.id = id;
-            this.dealId = ThreadLocalRandom.current().nextInt(1, 100000 + 1);
+            public TransferBody() {
+                this.dealType = "insurance";
+
+                int dealId = ThreadLocalRandom.current().nextInt(1, 10000 + 1);
+                this.dealId = dealId;
+                this.nbtDealId = dealId;
+
+                this.status = CliedisStatus.random().toString();
+                this.policyId = ThreadLocalRandom.current().nextLong(1, 10000 + 1);
+            }
+        }
+
+        @JsonProperty("type")
+        public String eventType = "CRM_POLICY_STATUS_UPDATE";
+
+        public TransferBody body;
+
+        public TransferObject() {
+            this.body = new TransferBody();
         }
     }
 
@@ -57,7 +74,7 @@ public class ScheduledTasks {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        ScheduledTasks.TransferObject transferObject = new ScheduledTasks.TransferObject(counter);
+        ScheduledTasks.TransferObject transferObject = new ScheduledTasks.TransferObject();
 
         String transferStr = "";
         try {
